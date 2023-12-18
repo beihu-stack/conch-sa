@@ -31,7 +31,7 @@
     </properties>
 
     <modules>
-        <module>conch-sa-core</module>
+        <module>conch-sa-core-v8</module>
     </modules>
 
     <dependencies>

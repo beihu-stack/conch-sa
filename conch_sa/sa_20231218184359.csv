@@ -1,7 +1,0 @@
-className,methodName,signature,invocationCount
-com/nabob/conch/core/support/demo/TargetProcess$Student,JITTest1,()V,100
-com/nabob/conch/core/support/demo/TargetProcess$Student,setId,(I)V,1
-com/nabob/conch/core/support/demo/TargetProcess$Student,JITTest4,(Ljava/lang/String;)V,0
-com/nabob/conch/core/support/demo/TargetProcess$Student,JITTest2,()V,267
-com/nabob/conch/core/support/demo/TargetProcess$Student,JITTest3,()V,268
-com/nabob/conch/core/support/demo/TargetProcess,main,([Ljava/lang/String;)V,1

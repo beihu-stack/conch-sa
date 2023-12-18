@@ -1,4 +1,4 @@
-package com.nabob.conch.core.support.demo;
+package com.nabob.conch.sa.core.support.demo;
 
 import java.lang.management.ManagementFactory;
 import java.util.Random;

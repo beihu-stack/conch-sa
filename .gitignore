@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+conch_sa_v8
+conch_sa_v9
+
+.flattened-pom.xml

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.nabob.conch</groupId>
+    <artifactId>conch-sa-core-v9</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>conch-sa-core-v9</name>
+    <description>conch-sa-core-v9</description>
+
+    <properties>
+        <main.user.dir>${basedir}/..</main.user.dir>
+        <java.version>17</java.version>
+        <project.encoding>UTF-8</project.encoding>
+
+        <maven.compiler.plugin>3.10.1</maven.compiler.plugin>
+    </properties>
+
+    <dependencies>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin}</version>
+                <configuration>
+                    <encoding>${project.encoding}</encoding>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
