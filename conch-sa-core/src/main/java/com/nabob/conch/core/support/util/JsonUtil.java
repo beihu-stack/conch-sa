@@ -1,4 +1,4 @@
-package com.nabob.conch.core.util;
+package com.nabob.conch.core.support.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;
