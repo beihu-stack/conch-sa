@@ -1,6 +1,7 @@
 package com.nabob.conch.core.support.demo;
 
 import java.lang.management.ManagementFactory;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -35,6 +36,9 @@ public class TargetProcess {
         for (int i = 0; i < 100000; i++) {
             student.JITTest3();
         }
+        for (int i = 0; i < 100000; i++) {
+            student.JITTest4(String.valueOf(new Random().nextInt()));
+        }
         //为方便通过SA观察结果，睡眠10000000        
         Thread.sleep(10000000 * 1000);
     }
@@ -57,6 +61,9 @@ public class TargetProcess {
 
         void JITTest3() {
             System.out.println(this.id);
+        }
+        void JITTest4(String name) {
+            System.out.println(name);
         }
     }
 }

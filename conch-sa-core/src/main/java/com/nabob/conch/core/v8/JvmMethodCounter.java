@@ -26,6 +26,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Jvm Method Counter
@@ -52,7 +56,20 @@ public class JvmMethodCounter {
             com/nabob/conch/core/support/demo/TargetProcess$Student,JITTest1,()V,100
             com/nabob/conch/core/support/demo/TargetProcess$Student,JITTest3,()V,268
          */
-        jvmMethodCounter.handle(1552, 10000, "com.nabob", "com.dao", "conch_sa", 100);
+//        jvmMethodCounter.handle(1552, 10000, "com.nabob", "com.dao", "conch_sa_v8", 100);
+
+        /*
+            Test-Result-Async CSV:
+            className,methodName,signature,invocationCount
+            com/nabob/conch/core/support/demo/TargetProcess$Student,JITTest1,()V,100
+            com/nabob/conch/core/support/demo/TargetProcess$Student,setId,(I)V,1
+            com/nabob/conch/core/support/demo/TargetProcess$Student,JITTest4,(Ljava/lang/String;)V,0
+            com/nabob/conch/core/support/demo/TargetProcess$Student,JITTest2,()V,267
+            com/nabob/conch/core/support/demo/TargetProcess$Student,JITTest3,()V,268
+            com/nabob/conch/core/support/demo/TargetProcess,main,([Ljava/lang/String;)V,1
+         */
+        jvmMethodCounter.handleAsync(3148, 10000, "com.nabob", "com.dao", "conch_sa_v8", 100);
+
     }
 
     private void handle(int pid, long timeout, String filterPrefix, String excludePrefix, String directory, Integer bufferSize) {
@@ -74,6 +91,38 @@ public class JvmMethodCounter {
             agent.detach();
         }
         closeWriter();
+    }
+
+    private void handleAsync(int pid, long timeout, String filterPrefix, String excludePrefix, String directory, Integer bufferSize) {
+        filterPrefix = filterPrefix.replace(".", "/");
+        Config config = new Config(pid, timeout, filterPrefix, excludePrefix, directory, bufferSize);
+
+        deleteOldFiles(config);
+
+        openWriter(config);
+
+        HotSpotAgent agent = new HotSpotAgent();
+        agent.attach(pid);
+
+        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        Future<?> submit = executor.submit(() -> {
+            try {
+                VM.getVM().getSystemDictionary().allClassesDo(new InvocationCounterVisitor(config));
+            } catch (Exception e) {
+                reportError(null, e);
+            }
+        });
+
+        try {
+            submit.get(timeout, TimeUnit.SECONDS);
+        } catch (Exception ex) {
+            reportError(null, ex);
+        } finally {
+            submit.cancel(true);
+            agent.detach();
+        }
+        closeWriter();
+        executor.shutdownNow();
     }
 
     class InvocationCounterVisitor implements SystemDictionary.ClassVisitor {
@@ -116,6 +165,11 @@ public class JvmMethodCounter {
             return;
         }
 
+        // 这个操作很关键，上面介绍过这个点：_counter包括三部分：
+        // - 第3-31位表示执行次数
+        // - 第2位表示是否已被编译1为编译
+        // - 第0位和第1位表示超出阈值时的处理，默认情况为01即超出阈值执行编译
+        // 右移三位的目的是统计出执行次数信息
         long invocationCount = method.getInvocationCount() >> 3;
 
         String signature = method.getSignature().asString();
@@ -214,7 +268,7 @@ public class JvmMethodCounter {
     }
 
     private static String getDefaultDirectory() {
-        return "conch_sa";
+        return "conch_sa_v8";
     }
 
     private static void deleteOldFiles(Config config) {
@@ -237,7 +291,7 @@ public class JvmMethodCounter {
         int pid;
 
         /**
-         * SA Count 获取 超时时间
+         * SA Count 获取 超时时间 单位：秒
          */
         long timeout;
 
