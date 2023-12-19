@@ -1,14 +1,13 @@
-package com.nabob.conch.sa.core.v8;
+package com.nabob.conch.sa.core.v9;
 
 import org.apache.commons.lang3.StringUtils;
 import sun.jvm.hotspot.HotSpotAgent;
-import sun.jvm.hotspot.memory.SystemDictionary;
+import sun.jvm.hotspot.classfile.ClassLoaderDataGraph;
 import sun.jvm.hotspot.oops.InstanceKlass;
 import sun.jvm.hotspot.oops.Klass;
 import sun.jvm.hotspot.oops.Method;
 import sun.jvm.hotspot.runtime.VM;
 import sun.jvm.hotspot.utilities.MethodArray;
-
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -32,10 +31,10 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Jvm Method Counter For Jvm8
+ * Jvm Method Counter For Jvm9+
  *
  * @author Adam
- * @since 2023/12/18
+ * @since 2023/12/19
  */
 public class JvmMethodCounter {
 
@@ -47,29 +46,8 @@ public class JvmMethodCounter {
     public static void main(String[] args) {
         JvmMethodCounter jvmMethodCounter = new JvmMethodCounter();
 
-        /*
-            Test-Result CSV:
-            className,methodName,signature,invocationCount
-            com/nabob/conch/core/support/demo/TargetProcess,main,([Ljava/lang/String;)V,1
-            com/nabob/conch/core/support/demo/TargetProcess$Student,setId,(I)V,1
-            com/nabob/conch/core/support/demo/TargetProcess$Student,JITTest2,()V,270
-            com/nabob/conch/core/support/demo/TargetProcess$Student,JITTest1,()V,100
-            com/nabob/conch/core/support/demo/TargetProcess$Student,JITTest3,()V,268
-         */
 //        jvmMethodCounter.handle(1552, 10000, "com.nabob", "com.dao", "conch_sa_v8", 100);
-
-        /*
-            Test-Result-Async CSV:
-            className,methodName,signature,invocationCount
-            com/nabob/conch/core/support/demo/TargetProcess$Student,JITTest1,()V,100
-            com/nabob/conch/core/support/demo/TargetProcess$Student,setId,(I)V,1
-            com/nabob/conch/core/support/demo/TargetProcess$Student,JITTest4,(Ljava/lang/String;)V,0
-            com/nabob/conch/core/support/demo/TargetProcess$Student,JITTest2,()V,267
-            com/nabob/conch/core/support/demo/TargetProcess$Student,JITTest3,()V,268
-            com/nabob/conch/core/support/demo/TargetProcess,main,([Ljava/lang/String;)V,1
-         */
-        jvmMethodCounter.handleAsync(29844, 10000, "com.nabob", "com.dao", "conch_sa_v8", 100);
-
+        jvmMethodCounter.handleAsync(29536, 10000, "com.nabob", "com.dao", "conch_sa_v9", 100);
     }
 
     private void handle(int pid, long timeout, String filterPrefix, String excludePrefix, String directory, Integer bufferSize) {
@@ -84,14 +62,13 @@ public class JvmMethodCounter {
         agent.attach(pid);
 
         try {
-            VM.getVM().getSystemDictionary().allClassesDo(new InvocationCounterVisitor(config));
+            VM.getVM().getClassLoaderDataGraph().classesDo(new InvocationCounterVisitor(config));
         } catch (Exception e) {
             reportError(null, e);
         } finally {
             agent.detach();
         }
         closeWriter();
-        System.out.println("end");
     }
 
     private void handleAsync(int pid, long timeout, String filterPrefix, String excludePrefix, String directory, Integer bufferSize) {
@@ -108,7 +85,7 @@ public class JvmMethodCounter {
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         Future<?> submit = executor.submit(() -> {
             try {
-                VM.getVM().getSystemDictionary().allClassesDo(new InvocationCounterVisitor(config));
+                VM.getVM().getClassLoaderDataGraph().classesDo(new InvocationCounterVisitor(config));
             } catch (Exception e) {
                 reportError(null, e);
             }
@@ -124,10 +101,9 @@ public class JvmMethodCounter {
         }
         closeWriter();
         executor.shutdownNow();
-        System.out.println("end");
     }
 
-    class InvocationCounterVisitor implements SystemDictionary.ClassVisitor {
+    class InvocationCounterVisitor implements ClassLoaderDataGraph.ClassVisitor {
         private final Config config;
 
         public InvocationCounterVisitor(Config config) {
@@ -153,7 +129,12 @@ public class JvmMethodCounter {
 
         MethodArray methods = ((InstanceKlass) klass).getMethods();
         for (int i = 0; i < methods.getLength(); i++) {
-            processSingleMethod(methods.at(i), className, config);
+            final Method method = methods.at(i);
+            if (Objects.isNull(method)) {
+                continue;
+            }
+
+            processSingleMethod(method, className, config);
         }
     }
 
@@ -270,7 +251,7 @@ public class JvmMethodCounter {
     }
 
     private static String getDefaultDirectory() {
-        return "conch_sa_v8";
+        return "conch_sa_v9";
     }
 
     private static void deleteOldFiles(Config config) {

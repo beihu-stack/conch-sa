@@ -12,15 +12,34 @@
     <description>conch-sa-core-v9</description>
 
     <properties>
-        <main.user.dir>${basedir}/..</main.user.dir>
-        <java.version>17</java.version>
+        <java.version>11</java.version>
         <project.encoding>UTF-8</project.encoding>
+
+        <!-- apache commons -->
+        <commons-lang3.version>3.12.0</commons-lang3.version>
+        <commons-collections4.version>4.4</commons-collections4.version>
+        <commons-configuration2.version>2.8.0</commons-configuration2.version>
+        <jackson-version>2.10.3</jackson-version>
 
         <maven.compiler.plugin>3.10.1</maven.compiler.plugin>
     </properties>
 
     <dependencies>
-
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>${commons-collections4.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-configuration2</artifactId>
+            <version>${commons-configuration2.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -33,6 +52,20 @@
                     <encoding>${project.encoding}</encoding>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
+                    <compilerArgs>
+                        <arg>--add-modules</arg>
+                        <arg>jdk.hotspot.agent</arg>
+                        <arg>--add-exports</arg>
+                        <arg>jdk.hotspot.agent/sun.jvm.hotspot=ALL-UNNAMED</arg>
+                        <arg>--add-exports</arg>
+                        <arg>jdk.hotspot.agent/sun.jvm.hotspot.classfile=ALL-UNNAMED</arg>
+                        <arg>--add-exports</arg>
+                        <arg>jdk.hotspot.agent/sun.jvm.hotspot.oops=ALL-UNNAMED</arg>
+                        <arg>--add-exports</arg>
+                        <arg>jdk.hotspot.agent/sun.jvm.hotspot.runtime=ALL-UNNAMED</arg>
+                        <arg>--add-exports</arg>
+                        <arg>jdk.hotspot.agent/sun.jvm.hotspot.utilities=ALL-UNNAMED</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
         </plugins>
