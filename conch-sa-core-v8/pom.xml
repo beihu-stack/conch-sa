@@ -2,39 +2,96 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>com.nabob.conch</groupId>
-        <artifactId>conch-sa</artifactId>
-        <version>${revision}</version>
-    </parent>
+
+    <groupId>com.nabob.conch</groupId>
     <artifactId>conch-sa-core-v8</artifactId>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>conch-sa-core</name>
-    <description>conch-sa-core</description>
+    <name>conch-sa-core-v8</name>
+    <description>conch-sa-core-v8</description>
 
     <properties>
-        <main.user.dir>${basedir}/..</main.user.dir>
+        <java.version>1.8</java.version>
+        <project.encoding>UTF-8</project.encoding>
+
+        <maven.deploy.plugin.version>3.0.0</maven.deploy.plugin.version>
+        <maven.compiler.plugin>3.10.1</maven.compiler.plugin>
+        <flatten-maven-plugin.version>1.2.7</flatten-maven-plugin.version>
+
+        <!-- apache commons -->
+        <commons-lang3.version>3.12.0</commons-lang3.version>
+        <commons-collections4.version>4.4</commons-collections4.version>
+        <commons-configuration2.version>2.8.0</commons-configuration2.version>
+        <jackson-version>2.10.3</jackson-version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>${commons-collections4.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-configuration2</artifactId>
+            <version>${commons-configuration2.version}</version>
+        </dependency>
+
         <!-- jackson-->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
+            <version>${jackson-version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
+            <version>${jackson-version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
+            <version>${jackson-version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson-version}</version>
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>${maven.deploy.plugin.version}</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin}</version>
+                <configuration>
+                    <encoding>${project.encoding}</encoding>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                        <compilerArguments>
+                            <!-- 要添加编译 类路径 bootclasspath： 指定sa-jdi.jar -->
+                            <bootclasspath>
+                                ${java.home}/../lib/sa-jdi.jar${path.separator}${java.home}/lib/rt.jar${path.separator}${java.home}/lib/jce.jar${path.separator}${java.home}/../lib/tools.jar
+                            </bootclasspath>
+                        </compilerArguments>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

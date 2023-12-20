@@ -61,5 +61,28 @@ maven-compiler-plugin插件添加配置：
 > - SDK 配置成 JDK 8
 > - Language level 配置成 8
 
+### 编译
+在conch-sa/conch-sa-core-v8/pom.xml的
+maven-compiler-plugin插件添加配置：
+```pom
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-compiler-plugin</artifactId>
+    <version>${maven.compiler.plugin}</version>
+    <configuration>
+        <encoding>${project.encoding}</encoding>
+        <source>${java.version}</source>
+        <target>${java.version}</target>
+            <compilerArguments>
+                <!-- 要添加编译 类路径 bootclasspath： 指定sa-jdi.jar -->
+                <bootclasspath>
+                    ${java.home}/../lib/sa-jdi.jar${path.separator}${java.home}/lib/rt.jar${path.separator}${java.home}/lib/jce.jar${path.separator}${java.home}/../lib/tools.jar
+                </bootclasspath>
+            </compilerArguments>
+    </configuration>
+</plugin>
+```
+
+### 运行
 在 *Project Structure -> SDKs* 对应的1.8的SDK里面新增依赖，如下图：
 <img src="assets/JVM8_SA_IDEA_CONFIG.png" alt="image-1" />
