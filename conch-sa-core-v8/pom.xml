@@ -90,6 +90,7 @@
                                 ${java.home}/../lib/sa-jdi.jar${path.separator}${java.home}/lib/rt.jar${path.separator}${java.home}/lib/jce.jar${path.separator}${java.home}/../lib/tools.jar
                             </bootclasspath>
                         </compilerArguments>
+                    <fork>true</fork>
                 </configuration>
             </plugin>
         </plugins>

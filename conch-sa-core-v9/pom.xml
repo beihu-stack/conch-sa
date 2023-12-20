@@ -66,6 +66,7 @@
                         <arg>--add-exports</arg>
                         <arg>jdk.hotspot.agent/sun.jvm.hotspot.utilities=ALL-UNNAMED</arg>
                     </compilerArgs>
+                    <fork>true</fork>
                 </configuration>
             </plugin>
         </plugins>
